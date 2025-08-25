@@ -11,17 +11,19 @@ LOG = color_me.create_logger()
 
 def send_discord_notification(
     webhook_url: str, 
-    flat_details: dict, 
+    flat_details: set, 
     user_email: str, 
-    application_status: str = "success"
+    application_status: str = "success",
+    pdf_path: str = None
 ):
     """Send Discord notification for apartment application.
 
     Args:
         webhook_url (str): Discord webhook URL.
-        flat_details (dict): Dictionary containing flat information.
+        flat_details (set): Set containing flat information strings.
         user_email (str): Email address used for the application.
         application_status (str): Status of the application ('success' or 'failed').
+        pdf_path (str): Path to the PDF file (optional).
     """
 
     if not webhook_url:
@@ -53,16 +55,21 @@ def send_discord_notification(
             embed.add_embed_field(name="❌ Status", value="Application Failed", inline=False)
 
         # Add apartment details to embed
-        embed.add_embed_field(name="🏠 Title", value=flat_details.get('title', 'N/A'), inline=False)
-        embed.add_embed_field(name="📍 Location", value=f"{flat_details.get('district', 'N/A')}, {flat_details.get('street', 'N/A')}", inline=True)
-        embed.add_embed_field(name="🏙️ Address", value=f"{flat_details.get('zip_code', 'N/A')} {flat_details.get('city', 'N/A')}", inline=True)
-        embed.add_embed_field(name="💰 Total Rent", value=flat_details.get('total_rent', 'N/A'), inline=True)
-        embed.add_embed_field(name="📏 Size", value=flat_details.get('size', 'N/A'), inline=True)
-        embed.add_embed_field(name="🚪 Rooms", value=flat_details.get('rooms', 'N/A'), inline=True)
+        # Convert set to list and extract information
+        flat_info_list = list(flat_details)
         
-        # Add WBS status
-        wbs_status = "Yes" if flat_details.get('wbs', False) else "No"
-        embed.add_embed_field(name="🎫 WBS Required", value=wbs_status, inline=True)
+        # Parse the flat details from the set
+        title_info = ""
+        link_info = ""
+        
+        for detail in flat_info_list:
+            if detail.startswith("[Applied]"):
+                title_info = detail.replace("[Applied] ", "")
+            elif detail.startswith("Apartment Link:"):
+                link_info = detail.replace("Apartment Link: ", "")
+        
+        embed.add_embed_field(name="🏠 Title", value=title_info if title_info else "N/A", inline=False)
+        embed.add_embed_field(name="🔗 Link", value=link_info if link_info else "N/A", inline=False)
         
         # Add timestamp
         embed.set_timestamp()
@@ -72,6 +79,20 @@ def send_discord_notification(
 
         # Add embed to webhook
         webhook.add_embed(embed)
+        
+        # Add PDF file as attachment if provided
+        if pdf_path and os.path.exists(pdf_path):
+            try:
+                with open(pdf_path, "rb") as f:
+                    webhook.add_file(file=f.read(), filename=os.path.basename(pdf_path))
+                LOG.info(color_me.blue(f"Added PDF attachment: {os.path.basename(pdf_path)}"))
+            except Exception as e:
+                LOG.warning(color_me.yellow(f"Failed to attach PDF file: {str(e)}"))
+                # Add PDF path as field if file attachment fails
+                embed.add_embed_field(name="📄 PDF Path", value=pdf_path, inline=False)
+        elif pdf_path:
+            LOG.warning(color_me.yellow(f"PDF file not found: {pdf_path}"))
+            embed.add_embed_field(name="📄 PDF Path", value=f"{pdf_path} (file not found)", inline=False)
         
         # Send webhook with rate limiting
         response = webhook.execute()

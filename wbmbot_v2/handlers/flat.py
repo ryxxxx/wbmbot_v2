@@ -1,4 +1,5 @@
 import hashlib
+import re
 
 
 class Flat:
@@ -38,15 +39,44 @@ class Flat:
         (
             self.district,
             self.title,
-            address,
-            self.total_rent,
-            ignore_1,
-            self.size,
-            ignore_2,
-            self.rooms,
             *_,
         ) = self.flat_attr
-        self.street, zip_info = address.rsplit(',', 1)
-        self.zip_code, self.city = zip_info.split()
         self.wbs = "wbs" in self.title.lower() or "wbs" in self.flat_elem.lower()
         self.hash = hashlib.sha256(self.flat_elem.encode("utf-8")).hexdigest()
+        
+        for i, line in enumerate(self.flat_attr):                
+            # Address: anything before comma, then 5-digit zip
+            if ',' in line and re.search(r'\d{5}', line):
+                parts = line.split(',', 1)
+                self.street = parts[0].strip()
+                zip_match = re.search(r'(\d{5})', parts[1])
+                if zip_match:
+                    self.zip_code = zip_match.group(1)
+                    self.city = parts[1].replace(self.zip_code, '').strip()
+            
+            # Rent: any number ending with €
+            if line.endswith('€'):
+                rent_text = line.replace('€', '').strip()
+                # Handle German number format: remove dots, replace comma with dot
+                rent_text = rent_text.replace('.', '')  # Remove all dots
+                rent_text = rent_text.replace(',', '.')  # Decimal separator
+                try:
+                    self.total_rent = float(rent_text)
+                except ValueError:
+                    pass
+            
+            # Size: any number followed by m²
+            size_match = re.search(r'([\d,\.]+)\s*m²', line)
+            if size_match:
+                size_text = size_match.group(1).replace(',', '.')
+                try:
+                    self.size = float(size_text)
+                except ValueError:
+                    pass
+            
+            # Rooms: digit followed by "Zimmer" (same or next line)
+            if re.match(r'^\d+$', line):
+                if (i + 1 < len(self.flat_attr) and self.flat_attr[i + 1] == "Zimmer") or "Zimmer" in line:
+                    self.rooms = int(line)
+            elif re.search(r'(\d+).*Zimmer', line):
+                self.rooms = int(re.search(r'(\d+)', line).group(1))

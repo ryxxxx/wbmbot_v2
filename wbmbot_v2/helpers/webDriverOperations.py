@@ -347,24 +347,17 @@ def apply_to_flat(
     # Send Discord notification
     if not test and user_profile.discord_notifications and constants.discord_webhook_url:
         # Extract flat details from the flat element for Discord embed
-        flat_lines = flat_element.text.split('\n')
         flat_details = {
-            'title': flat_title,
-            'district': flat_lines[1] if len(flat_lines) > 1 else 'N/A',
-            'street': flat_lines[2] if len(flat_lines) > 2 else 'N/A',
-            'zip_code': flat_lines[3].split()[0] if len(flat_lines) > 3 and flat_lines[3] else 'N/A',
-            'city': ' '.join(flat_lines[3].split()[1:]) if len(flat_lines) > 3 and len(flat_lines[3].split()) > 1 else 'N/A',
-            'total_rent': flat_lines[4] if len(flat_lines) > 4 else 'N/A',
-            'size': flat_lines[5] if len(flat_lines) > 5 else 'N/A',
-            'rooms': flat_lines[6] if len(flat_lines) > 6 else 'N/A',
-            'wbs': 'wbs' in flat_element.text.lower()
+            f"[Applied] {flat_title}",
+            f"Apartment Link: {flat_link}"
         }
         
         discord_notifications.send_discord_notification(
             constants.discord_webhook_url,
             flat_details,
             email,
-            "success"
+            "success",
+            pdf_path
         )
 
     return True
@@ -445,32 +438,33 @@ def process_flats(
                         )
                         continue
                     if not misc_operations.verify_flat_rent(
-                        misc_operations.convert_rent(flat_obj.total_rent),
+                        (flat_obj.total_rent),
                         user_profile.flat_rent_below,
                     ):
                         LOG.warning(
                             color_me.yellow(
-                                f"Ignoring flat '{flat_obj.title}' because the rent doesn't match our criteria --> Flat Rent: {misc_operations.convert_rent(flat_obj.total_rent)} € | User wants it below: {user_profile.flat_rent_below} € 🙈"
+                                f"Ignoring flat '{flat_obj.title}' because the rent doesn't match our criteria --> Flat Rent: {(flat_obj.total_rent)} € | User wants it below: {user_profile.flat_rent_below} € 🙈"
                             )
                         )
                         continue
                     if not misc_operations.verify_flat_size(
-                        misc_operations.convert_size(flat_obj.size),
+                        (flat_obj.size),
                         user_profile.flat_size_above,
+                        flat_obj.wbs
                     ):
                         LOG.warning(
                             color_me.yellow(
-                                f"Ignoring flat '{flat_obj.title}' because the size doesn't match our criteria --> Flat Size: {misc_operations.convert_size(flat_obj.size)} m² | User wants it above: {user_profile.flat_size_above} m² 🙈"
+                                f"Ignoring flat '{flat_obj.title}' because the size doesn't match our criteria --> Flat Size: {(flat_obj.size)} m² | User wants it above: {user_profile.flat_size_above} m² 🙈"
                             )
                         )
                         continue
                     if not misc_operations.verify_flat_rooms(
-                        misc_operations.get_zimmer_count(flat_obj.rooms),
+                        (flat_obj.rooms),
                         user_profile.flat_rooms_above,
                     ):
                         LOG.warning(
                             color_me.yellow(
-                                f"Ignoring flat '{flat_obj.title}' because the rooms don't match our criteria --> Flat Rooms: {misc_operations.get_zimmer_count(flat_obj.rooms)} | User wants it above: {user_profile.flat_rooms_above} 🙈"
+                                f"Ignoring flat '{flat_obj.title}' because the rooms don't match our criteria --> Flat Rooms: {(flat_obj.rooms)} | User wants it above: {user_profile.flat_rooms_above} 🙈"
                             )
                         )
                         continue

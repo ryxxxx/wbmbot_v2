@@ -33,7 +33,7 @@ def verify_flat_rent(flat_rent, user_flat_rent):
         return False
 
 
-def verify_flat_size(flat_size, user_flat_size):
+def verify_flat_size(flat_size, user_flat_size, wbs=False):
     """Check if the flat size is >= the user specified flat size."""
 
     # If the size is "" it means the listing has some improper values and
@@ -41,7 +41,10 @@ def verify_flat_size(flat_size, user_flat_size):
     # so we apply regardless
     if flat_size == "":
         return True
-
+    
+    if(wbs and flat_size >= 50.0):
+        return False
+    
     # Check size numbers
     if flat_size >= float(user_flat_size):
         return True

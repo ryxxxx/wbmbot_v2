@@ -4,7 +4,7 @@ import time
 
 from chromeDriver import chrome_driver_configurator as cdc
 from handlers import user
-from helpers import constants, webDriverOperations
+from helpers import constants, webDriverOperations, discord_notifications
 from logger import wbm_logger
 from utility import io_operations, misc_operations
 
@@ -101,6 +101,18 @@ def main():
     # Get URL
     start_url = constants.wbm_url if not args.test else constants.test_wbm_url
 
+    # Send Discord startup notification
+    if not args.test and user_profile.discord_notifications and constants.discord_webhook_url:
+        mode = "headless" if args.headless else "visible browser"
+        discord_notifications.send_discord_status_update(
+            constants.discord_webhook_url,
+            f"🚀 WBMBOT v{constants.bot_version} started successfully!\n"
+            f"Mode: {mode}\n"
+            f"Interval: {args.interval} minutes\n"
+            f"Target: {start_url}",
+            "success"
+        )
+
     ###### Start the magic ######
     current_page = 1
     previous_page = 1
@@ -124,8 +136,19 @@ def main():
             color_me.red(f"Bot has crashed... Attempting to restart it now! ❤️‍🩹")
         )
         LOG.error(color_me.red(f"Crash reason: {e}"))
+        
+        # Send Discord crash notification
+        if not args.test and user_profile.discord_notifications and constants.discord_webhook_url:
+            discord_notifications.send_discord_status_update(
+                constants.discord_webhook_url,
+                f"💥 WBMBOT v{constants.bot_version} crashed and is restarting...\n"
+                f"Error: {str(e)}\n"
+                f"Restart attempt in 3 minutes",
+                "error"
+            )
+        
         # Wait for a few seconds before restarting
-        time.sleep(5)
+        time.sleep(180)
         # Restart the script
         main()
 

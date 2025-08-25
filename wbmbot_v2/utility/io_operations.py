@@ -91,9 +91,9 @@ def write_log_file(log_file: str, email: str, flat_obj):
                 "title": flat_obj.title,
                 "street": flat_obj.street,
                 "zip_code": flat_obj.zip_code,
-                "rent": misc_operations.convert_rent(flat_obj.total_rent),
-                "size": misc_operations.convert_size(flat_obj.size),
-                "rooms": misc_operations.get_zimmer_count(flat_obj.rooms),
+                "rent": (flat_obj.total_rent),
+                "size": (flat_obj.size),
+                "rooms": (flat_obj.rooms),
                 "wbs?": flat_obj.wbs,
             }
     else:
@@ -106,9 +106,9 @@ def write_log_file(log_file: str, email: str, flat_obj):
                 "title": flat_obj.title,
                 "street": flat_obj.street,
                 "zip_code": flat_obj.zip_code,
-                "rent": misc_operations.convert_rent(flat_obj.total_rent),
-                "size": misc_operations.convert_size(flat_obj.size),
-                "rooms": misc_operations.get_zimmer_count(flat_obj.rooms),
+                "rent": (flat_obj.total_rent),
+                "size": (flat_obj.size),
+                "rooms": (flat_obj.rooms),
                 "wbs?": flat_obj.wbs,
             }
         }
