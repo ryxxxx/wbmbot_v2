@@ -174,5 +174,7 @@ def get_zimmer_count(text: str) -> int:
     # If you expect only one number in the string, you can directly access it
     if count:
         count = int(count[0])
+    else:
+        count = 0
 
     return count
