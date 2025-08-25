@@ -37,8 +37,16 @@ class ChromeDriverConfigurator:
         """
         Creates the driver with the specified ChromeOptions
         """
+
+                # Get the ChromeDriver path
+        driver_path = ChromeDriverManager().install()
+        
+        # Fix the path if it points to wrong file
+        if driver_path.endswith('THIRD_PARTY_NOTICES.chromedriver'):
+            driver_path = driver_path.replace('THIRD_PARTY_NOTICES.chromedriver', 'chromedriver')
+
         self.driver = webdriver.Chrome(
-            service=Service(ChromeDriverManager().install()),
+            service=Service(driver_path),
             options=self.chrome_options,
         )
         # Wait 5 seconds before doing stuff
