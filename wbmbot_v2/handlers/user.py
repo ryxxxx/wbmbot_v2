@@ -49,6 +49,7 @@ class User:
         self.city = self.config.get("city", "")
         self.emails = self.config.get("emails", [])
         self.notifications_email = self.config.get("notifications_email", "")
+        self.discord_notifications = self.config.get("discord_notifications", False)
         self.phone = self.config.get("phone", "")
         self.wbs = "yes" in self.config.get("wbs", "").lower()
         self.wbs_date = self.config.get("wbs_date", "").replace("/", "")
@@ -90,6 +91,7 @@ class User:
         output += f"City: {self.city}\n"
         output += f"Emails: {', '.join(self.emails)}\n"
         output += f"Notifications Email: {self.notifications_email}\n"
+        output += f"Discord Notifications: {'Yes' if self.discord_notifications else 'No'}\n"
         output += f"Phone: {self.phone}\n"
         output += f"WBS: {'Yes' if self.wbs else 'No'}\n"
         output += f"WBS Date: {self.wbs_date}\n"

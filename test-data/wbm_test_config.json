@@ -6,6 +6,7 @@
         "random_user@outlook.com"
     ],
     "notifications_email": "random_user@outlook.com",
+    "discord_notifications": true,
     "street": "No-Add Str. 123",
     "zip_code": "12345",
     "city": "Berlin",

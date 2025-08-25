@@ -13,6 +13,9 @@ now = now.strftime("%Y-%m-%d_%H-%M")
 # Retrieve email and password from environment variables
 email_password = os.environ.get("EMAIL_PASSWORD")
 
+# Retrieve Discord webhook URL from environment variables
+discord_webhook_url = os.environ.get("DISCORD_WEBHOOK_URL")
+
 # WBM Config File Name
 wbm_config_name = f"{os.getcwd()}/configs/wbm_config.json"
 wbm_test_config_name = f"{os.getcwd()}/test-data/wbm_test_config.json"

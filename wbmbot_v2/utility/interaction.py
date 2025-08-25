@@ -38,6 +38,20 @@ def setup_wbm_config():
         "Please input (or leave empty) the e-mail (@outlook only) that you want to send notifications from: "
     )
 
+    # Collect Discord notification preferences
+    discord_choice = input(
+        "Do you want to enable Discord notifications? Please type yes / no: "
+    ).lower()
+    data["discord_notifications"] = discord_choice == "yes"
+    
+    if data["discord_notifications"]:
+        print("\nTo enable Discord notifications, you need to set up a Discord webhook:")
+        print("1. Go to your Discord server settings")
+        print("2. Click on 'Integrations' -> 'Webhooks'")
+        print("3. Click 'New Webhook' and copy the webhook URL")
+        print("4. Set the environment variable: export DISCORD_WEBHOOK_URL='your_webhook_url_here'")
+        print("5. Restart the bot after setting the environment variable\n")
+
     # Collect additional user information
     data["street"] = input(
         "Please input your street and street number and confirm with enter or leave empty and skip with enter: "

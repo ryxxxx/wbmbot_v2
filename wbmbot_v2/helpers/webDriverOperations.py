@@ -2,7 +2,7 @@ import os
 import time
 
 from handlers import flat
-from helpers import constants, notifications
+from helpers import constants, notifications, discord_notifications
 from httpsWrapper import httpPageDownloader as hpd
 from logger import wbm_logger
 from selenium.common.exceptions import (
@@ -334,7 +334,7 @@ def apply_to_flat(
     if not test:
         web_driver.find_element(By.XPATH, "//button[@type='submit']").click()
 
-    # Send e-mail
+    # Send e-mail notification
     if not test and user_profile.notifications_email:
         notifications.send_email_notification(
             email,
@@ -342,6 +342,29 @@ def apply_to_flat(
             f"[Applied] {flat_title}",
             f"Appartment Link: {flat_link}\n\nYour Profile:\n\n{user_profile}",
             pdf_path,
+        )
+
+    # Send Discord notification
+    if not test and user_profile.discord_notifications and constants.discord_webhook_url:
+        # Extract flat details from the flat element for Discord embed
+        flat_lines = flat_element.text.split('\n')
+        flat_details = {
+            'title': flat_title,
+            'district': flat_lines[1] if len(flat_lines) > 1 else 'N/A',
+            'street': flat_lines[2] if len(flat_lines) > 2 else 'N/A',
+            'zip_code': flat_lines[3].split()[0] if len(flat_lines) > 3 and flat_lines[3] else 'N/A',
+            'city': ' '.join(flat_lines[3].split()[1:]) if len(flat_lines) > 3 and len(flat_lines[3].split()) > 1 else 'N/A',
+            'total_rent': flat_lines[4] if len(flat_lines) > 4 else 'N/A',
+            'size': flat_lines[5] if len(flat_lines) > 5 else 'N/A',
+            'rooms': flat_lines[6] if len(flat_lines) > 6 else 'N/A',
+            'wbs': 'wbs' in flat_element.text.lower()
+        }
+        
+        discord_notifications.send_discord_notification(
+            constants.discord_webhook_url,
+            flat_details,
+            email,
+            "success"
         )
 
     return True
