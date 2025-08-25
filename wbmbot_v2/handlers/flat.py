@@ -34,6 +34,8 @@ class Flat:
         self.flat_attr = self.flat_elem.split("\n")
         if not self.test:
             self.flat_attr = [item for item in self.flat_attr if item.strip()]
+        for i in self.flat_attr:
+            print(i)
         self.attr_size = len(self.flat_attr)
         print(self.flat_attr) if self.test else None
         (
@@ -43,6 +45,14 @@ class Flat:
         ) = self.flat_attr
         self.wbs = "wbs" in self.title.lower() or "wbs" in self.flat_elem.lower()
         self.hash = hashlib.sha256(self.flat_elem.encode("utf-8")).hexdigest()
+        
+        # Initialize all attributes with default values
+        self.street = None
+        self.zip_code = None
+        self.city = None
+        self.total_rent = None
+        self.size = None
+        self.rooms = None
         
         for i, line in enumerate(self.flat_attr):                
             # Address: anything before comma, then 5-digit zip
