@@ -40,4 +40,4 @@ RUN python3 -m venv /home/venv && \
     /home/venv/bin/pip install --no-cache-dir -r /home/wbmbot_v2/requirements.txt
 
 # Command to run the bot using the virtual environment
-CMD ["/bin/bash"]  # Starts bash instead
+CMD ["sh"]  # Starts bash instead
