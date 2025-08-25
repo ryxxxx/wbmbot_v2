@@ -41,4 +41,3 @@ RUN python3 -m venv /home/venv && \
 
 # Command to run the bot using the virtual environment
 CMD ["/home/venv/bin/python", "/home/wbmbot_v2/main.py", "-H"]
-/home/venv/bin/python /home/wbmbot_v2/main.py -H
