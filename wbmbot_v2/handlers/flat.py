@@ -36,16 +36,17 @@ class Flat:
         self.attr_size = len(self.flat_attr)
         print(self.flat_attr) if self.test else None
         (
-            self.title,
             self.district,
-            self.street,
+            self.title,
             address,
             self.total_rent,
+            ignore_1,
             self.size,
+            ignore_2,
             self.rooms,
             *_,
         ) = self.flat_attr
-        self.zip_code, self.city = address.split()
-        self.zip_code = self.zip_code.strip()
+        self.street, zip_info = address.rsplit(',', 1)
+        self.zip_code, self.city = zip_info.split()
         self.wbs = "wbs" in self.title.lower() or "wbs" in self.flat_elem.lower()
         self.hash = hashlib.sha256(self.flat_elem.encode("utf-8")).hexdigest()
