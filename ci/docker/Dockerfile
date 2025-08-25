@@ -40,8 +40,4 @@ RUN python3 -m venv /home/venv && \
     /home/venv/bin/pip install --no-cache-dir -r /home/wbmbot_v2/requirements.txt
 
 # Command to run the bot using the virtual environment
-# Install bash first (for Debian/Ubuntu-based images):
-RUN apt-get update && apt-get install -y bash
-
-# Then use bash as CMD:
-CMD ["bash"]
+CMD ["tail", "-f", "/dev/null"]
