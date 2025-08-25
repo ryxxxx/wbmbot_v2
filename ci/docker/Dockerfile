@@ -13,6 +13,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
+    python3-venv \
     nano \
     wget \
     gnupg \
@@ -34,8 +35,9 @@ COPY logging/ /home/logging
 COPY offline_viewings/ /home/offline_viewings
 COPY wbmbot_v2/ /home/wbmbot_v2
 
-# Install project dependencies
-RUN pip3 install --no-cache-dir -r /home/wbmbot_v2/requirements.txt
+# Create and activate virtual environment, then install dependencies
+RUN python3 -m venv /home/venv && \
+    /home/venv/bin/pip install --no-cache-dir -r /home/wbmbot_v2/requirements.txt
 
-# Command to run the bot
-CMD ["python3", "/home/wbmbot_v2/main.py", "-H"]
+# Command to run the bot using the virtual environment
+CMD ["/home/venv/bin/python", "/home/wbmbot_v2/main.py", "-H"]
