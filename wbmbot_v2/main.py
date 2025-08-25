@@ -95,6 +95,7 @@ def main():
     )
     # Create User Profile
     user_profile = user.User(wbm_config)
+    LOG.info(color_me.cyan(f"User Profile Loaded:\n{user_profile}"))
     # Create Logger file
     io_operations.initialize_application_logger(constants.log_file_path)
     # Get URL

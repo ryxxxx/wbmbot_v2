@@ -36,7 +36,7 @@ test_wbm_url = f"file://{os.getcwd()}/test-data/angebote.html"
 
 # Intro Banner
 
-intro_banner = """
+intro_banner = r"""
  __      _____ __  __   ___      _         ____
  \ \    / / _ )  \/  | | _ ) ___| |_  __ _|__ /
   \ \/\/ /| _ \ |\/| | | _ \/ _ \  _| \ V /|_ \ 
