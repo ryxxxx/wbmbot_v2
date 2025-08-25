@@ -34,10 +34,15 @@ COPY configs/ /home/configs
 COPY logging/ /home/logging
 COPY offline_viewings/ /home/offline_viewings
 COPY wbmbot_v2/ /home/wbmbot_v2
+COPY generate_config_from_env.py /home/
 
 # Create and activate virtual environment, then install dependencies
 RUN python3 -m venv /home/venv && \
     /home/venv/bin/pip install --no-cache-dir -r /home/wbmbot_v2/requirements.txt
 
-# Command to run the bot using the virtual environment
-CMD ["tail", "-f", "/dev/null"]
+# Create entrypoint script that generates config from env vars and starts the bot
+RUN echo '#!/bin/bash\necho "Generating WBM config from environment variables..."\n/home/venv/bin/python /home/generate_config_from_env.py\necho "Starting WBM bot in headless mode..."\n/home/venv/bin/python /home/wbmbot_v2/main.py -H' > /home/entrypoint.sh && \
+    chmod +x /home/entrypoint.sh
+
+# Command to run the entrypoint script
+CMD ["/home/entrypoint.sh"]
